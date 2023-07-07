@@ -284,7 +284,6 @@ export {
   SECTION_ID_EXPORT,
   SECTION_ID_FUNCTION,
   SECTION_ID_TYPE,
-  setup,
   stringToBytes,
   typeidx,
   typesec,
