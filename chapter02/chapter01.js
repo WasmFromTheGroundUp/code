@@ -1,7 +1,3 @@
-import { setup } from '../book.js';
-
-const { test, assert } = setup('chapter01');
-
 function compileVoidLang(code) {
   if (code === '') {
     return [0, 97, 115, 109, 1, 0, 0, 0];
@@ -10,25 +6,12 @@ function compileVoidLang(code) {
   }
 }
 
-test('compileVoidLang works for empty string', () => {
-  const bytes = compileVoidLang('');
-  assert.is(Array.isArray(bytes), true);
-  assert.throws(() => compileVoidLang('42'));
-});
-
 function instantiateModule(arrayOfBytes) {
   // flatten the array to allow generating nested arrays
   const flatBytes = arrayOfBytes.flat(Infinity);
 
   return WebAssembly.instantiate(Uint8Array.from(flatBytes));
 }
-
-test('compileVoidLang result compiles to a WebAssembly object', async () => {
-  const { instance, module } = await instantiateModule(compileVoidLang(''));
-
-  assert.is(instance instanceof WebAssembly.Instance, true);
-  assert.is(module instanceof WebAssembly.Module, true);
-});
 
 function stringToBytes(s) {
   return Array.from(s).map((c) => c.charCodeAt(0));
@@ -112,27 +95,6 @@ function codesec(codes) {
   return section(SECTION_ID_CODE, codes);
 }
 
-function compileNopLang(source) {
-  if (source === '') {
-    return [
-      magic(),
-      version(),
-      typesec([functype([], [])]),
-      funcsec([typeidx(0)]),
-      codesec([code(func([], [instr.end()]))]),
-    ];
-  } else {
-    throw new Error(`Expected empty code, got: "${source}"`);
-  }
-}
-
-test('compileNopLang compiles to a wasm module', async () => {
-  const { instance, module } = await instantiateModule(compileNopLang(''));
-
-  assert.is(instance instanceof WebAssembly.Instance, true);
-  assert.is(module instanceof WebAssembly.Module, true);
-});
-
 const SECTION_ID_EXPORT = 7;
 
 function name(s) {
@@ -171,13 +133,6 @@ function compileNopLangExport(source) {
     codesec([code(func([], [instr.end()]))]),
   ]);
 }
-
-test('compileNopLang result compiles to a wasm module', async () => {
-  const { instance } = await instantiateModule(compileNopLangExport(''));
-
-  assert.is(instance.exports.main(), undefined);
-  assert.throws(() => compileNopLangExport('42'));
-});
 
 function i32(v) {
   if (v <= 63) {
