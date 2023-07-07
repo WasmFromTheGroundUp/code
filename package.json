@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node scripts/test.js",
+    "postinstall": "head -n10 README.md"
+  },
+  "devDependencies": {
+    "ohm-js": "^17.1.0",
+    "uvu": "^0.5.6"
+  }
+}
