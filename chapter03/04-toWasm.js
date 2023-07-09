@@ -44,7 +44,7 @@ semantics.addOperation('jsValue', {
 
 semantics.addOperation('toWasm', {
   Main(expr) {
-    return [expr.toWasm(), instr.end()];
+    return [expr.toWasm(), instr.end];
   },
   Expr(num, iterOps, iterOperands) {
     const result = [num.toWasm()];

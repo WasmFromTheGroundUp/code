@@ -86,7 +86,7 @@ function compile(grammar, source) {
 
 semantics.addOperation('toWasm', {
   Main(num) {
-    return [num.toWasm(), instr.end()];
+    return [num.toWasm(), instr.end];
   },
   number(digits) {
     const value = this.jsValue();

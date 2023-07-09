@@ -1,11 +1,3 @@
-function compileVoidLang(code) {
-  if (code === '') {
-    return [0, 97, 115, 109, 1, 0, 0, 0];
-  } else {
-    throw new Error(`Expected empty code, got: "${code}"`);
-  }
-}
-
 function instantiateModule(arrayOfBytes) {
   // flatten the array to allow generating nested arrays
   const flatBytes = arrayOfBytes.flat(Infinity);
@@ -81,7 +73,7 @@ function funcsec(typeidxs) {
 const SECTION_ID_CODE = 10;
 
 const instr = {};
-instr.end = () => 11;
+instr.end = 0x0b;
 
 function code(func) {
   return vec(func);
@@ -121,7 +113,7 @@ function module(sections) {
   return [magic(), version(), sections];
 }
 
-function compileNopLangExport(source) {
+function compileNopLang(source) {
   if (source !== '') {
     throw new Error(`Expected empty code, got: "${source}"`);
   }
@@ -130,7 +122,7 @@ function compileNopLangExport(source) {
     typesec([functype([], [])]),
     funcsec([typeidx(0)]),
     exportsec([export_('main', exportdesc.funcidx(0))]),
-    codesec([code(func([], [instr.end()]))]),
+    codesec([code(func([], [instr.end]))]),
   ]);
 }
 
@@ -148,7 +140,7 @@ const numtype = {
   },
 };
 
-instr.nop = () => 0x01;
+instr.nop = 0x01;
 // Bytecode instruction to emit a literal i32 value
 i32.const = (v) => [0x41, i32(v)];
 
@@ -162,74 +154,11 @@ function compileConstLang(source) {
     typesec([functype([], [numtype.i32()])]),
     funcsec([typeidx(0)]),
     exportsec([export_('main', exportdesc.funcidx(0))]),
-    codesec([code(func([], [i32.const(value), instr.nop(), instr.end()]))]),
+    codesec([code(func([], [i32.const(value), instr.nop, instr.end]))]),
   ]);
 }
 
 function compileSplitLang(source) {
-  const instrNames = {
-    nop: 0x01,
-    end: 11,
-    'i32.const': 0x41,
-    'i32.add': 0x6a,
-    'i32.sub': 0x6b,
-  };
-
-  const instructions = source
-    .trim()
-    .split(/\s+/g)
-    .map((token) => {
-      const value = Number.parseInt(token, 10);
-      if (Number.isFinite(value)) {
-        return i32(value);
-      } else if (instrNames[token]) {
-        return instrNames[token];
-      } else {
-        throw new Error(`Expected integer or instruction, got: "${token}"`);
-      }
-    })
-    .flat(Infinity);
-
-  return module([
-    typesec([functype([], [numtype.i32()])]),
-    funcsec([typeidx(0)]),
-    exportsec([export_('main', exportdesc.funcidx(0))]),
-    codesec([code(func([], instructions))]),
-  ]);
-}
-
-function compileSplitLang1(source) {
-  const instrNames = {
-    nop: 0x01,
-    end: 11,
-    'i32.add': 0x6a,
-    'i32.sub': 0x6b,
-  };
-
-  const instructions = source
-    .trim()
-    .split(/\s+/g)
-    .map((token) => {
-      const value = Number.parseInt(token, 10);
-      if (Number.isFinite(value)) {
-        return [0x41, i32(value)];
-      } else if (instrNames[token]) {
-        return instrNames[token];
-      } else {
-        throw new Error(`Expected integer or instruction, got: "${token}"`);
-      }
-    })
-    .flat(Infinity);
-
-  return module([
-    typesec([functype([], [numtype.i32()])]),
-    funcsec([typeidx(0)]),
-    exportsec([export_('main', exportdesc.funcidx(0))]),
-    codesec([code(func([], instructions))]),
-  ]);
-}
-
-function compileSplitLang2(source) {
   const instrNames = {
     nop: 0x01,
     end: 11,

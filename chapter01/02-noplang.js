@@ -2,14 +2,6 @@ import { setup } from '../book.js';
 
 const { test, assert } = setup('chapter01');
 
-function compileVoidLang(code) {
-  if (code === '') {
-    return [0, 97, 115, 109, 1, 0, 0, 0];
-  } else {
-    throw new Error(`Expected empty code, got: "${code}"`);
-  }
-}
-
 test('compileVoidLang works for empty string', () => {
   const bytes = compileVoidLang('');
   assert.is(Array.isArray(bytes), true);
@@ -48,7 +40,7 @@ function version() {
   return int32ToBytes(1);
 }
 
-function compileVoidLang1(code) {
+function compileVoidLang(code) {
   if (code === '') {
     return [magic(), version()];
   } else {
@@ -106,7 +98,7 @@ function funcsec(typeidxs) {
 const SECTION_ID_CODE = 10;
 
 const instr = {};
-instr.end = () => 11;
+instr.end = 0x0b;
 
 function code(func) {
   return vec(func);
@@ -118,20 +110,6 @@ function func(locals, expr) {
 
 function codesec(codes) {
   return section(SECTION_ID_CODE, codes);
-}
-
-function compileNopLang(source) {
-  if (source === '') {
-    return [
-      magic(),
-      version(),
-      typesec([functype([], [])]),
-      funcsec([typeidx(0)]),
-      codesec([code(func([], [instr.end()]))]),
-    ];
-  } else {
-    throw new Error(`Expected empty code, got: "${source}"`);
-  }
 }
 
 test('compileNopLang compiles to a wasm module', async () => {
@@ -167,7 +145,7 @@ function module(sections) {
   return [magic(), version(), sections];
 }
 
-function compileNopLangExport(source) {
+function compileNopLang(source) {
   if (source !== '') {
     throw new Error(`Expected empty code, got: "${source}"`);
   }
@@ -176,7 +154,7 @@ function compileNopLangExport(source) {
     typesec([functype([], [])]),
     funcsec([typeidx(0)]),
     exportsec([export_('main', exportdesc.funcidx(0))]),
-    codesec([code(func([], [instr.end()]))]),
+    codesec([code(func([], [instr.end]))]),
   ]);
 }
 
